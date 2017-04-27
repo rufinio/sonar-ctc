@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 import org.sonar.api.batch.sensor.coverage.NewCoverage;
+import org.sonar.api.batch.sensor.coverage.CoverageType;
 
 @SuppressWarnings("rawtypes")
 public class CtcSensor implements Sensor {
@@ -84,7 +85,7 @@ public class CtcSensor implements Sensor {
         
         // core metrics
         
-        NewCoverage newCoverage = sensorContext.newCoverage().onFile(coveredFile);
+        NewCoverage newCoverage = sensorContext.newCoverage().ofType(CoverageType.UNIT).onFile(coveredFile);
         
         hitsByLine = ctcMeasures.getHitsByLine();
         for (Map.Entry<Long, Long> entry : hitsByLine.entrySet()) {
