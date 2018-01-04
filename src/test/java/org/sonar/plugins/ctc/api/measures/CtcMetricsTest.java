@@ -28,7 +28,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 public class CtcMetricsTest {
 
-  private static final int NR_OF_METRICS = 14;
+  private static final int NR_OF_METRICS = 13;
 
   private CtcMetrics testee;
 

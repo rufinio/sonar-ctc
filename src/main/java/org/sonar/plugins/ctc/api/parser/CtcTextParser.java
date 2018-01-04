@@ -102,7 +102,6 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     if (matcher.usePattern(FILE_HEADER).find(FROM_START)) {
       return parseFileUnit();
     } else if (matcher.usePattern(CtcResult.REPORT_FOOTER).find(FROM_START)) {
-      parseReportUnit();
       state = State.END;
       scanner.close();
       return projectBuilder.build();
@@ -246,16 +245,4 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
       LOG.trace("Matcher: {}", matcher);
     }
   }
-
-  private void parseReportUnit() {
-    long mp = 0;
-    try {
-      mp = Long.parseLong(matcher.group(MP_GROUP));
-    } catch (NumberFormatException e) {
-      LOG.error("Could not parse '{}' to Integer", matcher.group(MP_GROUP));
-      LOG.trace("Whole Group: {}", matcher.group(WHOLE_GROUP));
-    }
-    projectBuilder.setMeasurePoints(mp);
-  }
-
 }

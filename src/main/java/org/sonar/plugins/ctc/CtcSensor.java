@@ -135,14 +135,6 @@ public class CtcSensor implements Sensor {
       } else {
         LOG.error("File not mapped to resource! ({})", filePath);
       }
-    } else {
-      
-      // CTC++ project measures
-      sensorContext.<Integer>newMeasure()
-        .forMetric(CtcMetrics.CTC_MEASURE_POINTS)
-        .on(sensorContext.module())
-        .withValue((int)ctcMeasures.getMeasurePoints())
-        .save();
     }
   }
 

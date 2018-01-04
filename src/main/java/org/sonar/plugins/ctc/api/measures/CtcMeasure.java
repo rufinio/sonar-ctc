@@ -169,14 +169,6 @@ public class CtcMeasure {
     return this;
   }
 
-  public void setMeasurePoints(long mp) {
-    measurePoints = mp;
-  }
-
-  public long getMeasurePoints() {
-    return measurePoints;
-  }
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

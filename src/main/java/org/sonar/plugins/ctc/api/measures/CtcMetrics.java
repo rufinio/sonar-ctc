@@ -140,14 +140,6 @@ public class CtcMetrics implements Metrics {
     .setDeleteHistoricalData(true)
     .create();
 
-  public static final String CTC_MEASURE_POINTS_KEY = "ctc_measure_points";
-  public static final Metric<Integer> CTC_MEASURE_POINTS = new Builder(CTC_MEASURE_POINTS_KEY, "CTC++ used measurement points", INT)
-    .setDescription("Overall used measurement points by CTC++")
-    .setDomain(DOMAIN_CTC_TEST)
-    .setDirection(DIRECTION_BETTER)
-    .setQualitative(false)
-    .create();
-
   public static final String CTC_ORIG_REPORT_NAME_KEY = "ctc_orig_report_name";
   public static final Metric<String> CTC_ORIG_REPORT_NAME = new Builder(CTC_ORIG_REPORT_NAME_KEY, "CTC++ Report reportfile", ValueType.STRING)
     .setDescription("Filename used by original HTML-Report")
@@ -164,7 +156,6 @@ public class CtcMetrics implements Metrics {
     .add(CTC_ORIG_REPORT_NAME)
     .build();
   public static final List<Metric> PROJECT_METRICS = new ListBuilder()
-    .add(CTC_MEASURE_POINTS)
     .build();
   public static final List<Metric> RELATIVE_METRICS = new ListBuilder()
     .add(CTC_CONDITION_COVERAGE, CTC_STATEMENT_COVERAGE)
