@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.ctc.api.parser;
 
+import org.apache.commons.io.FilenameUtils;
 import com.google.common.collect.AbstractIterator;
 import org.jfree.util.Log;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   }
 
   private CtcMeasure parseUnit() {
-	  LOG.info(matcher.toString());
+	  LOG.debug(matcher.toString());
     if (matcher.usePattern(FILE_HEADER).find(FROM_START)) {
       return parseFileUnit();
     } else if (matcher.usePattern(CtcResult.REPORT_FOOTER).find(FROM_START)) {
@@ -113,7 +114,19 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   }
 
   private CtcMeasure parseFileUnit() {
-    File file = new File("./" + matcher.group(1));
+    
+    String normalizedFilename;
+    String filename = matcher.group(1);
+    
+    if((new File(filename)).isAbsolute() == false) {
+      normalizedFilename = FilenameUtils.normalize("./" + filename);
+    }
+    else {
+      normalizedFilename = FilenameUtils.normalize(filename);
+    }
+        
+    File file = new File(normalizedFilename);
+    
     CtcMeasure bob = new CtcMeasure(file);
     try {
       addLines(bob);

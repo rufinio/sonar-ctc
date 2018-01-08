@@ -83,53 +83,59 @@ public class CtcSensor implements Sensor {
       InputFile coveredFile = sensorContext.fileSystem().inputFile(sensorContext.fileSystem().predicates().hasPath(filePath));
       if (coveredFile != null) {
         
-        // core metrics
-        
-        NewCoverage newCoverage = sensorContext.newCoverage().ofType(CoverageType.UNIT).onFile(coveredFile);
-        
-        hitsByLine = ctcMeasures.getHitsByLine();
-        for (Map.Entry<Long, Long> entry : hitsByLine.entrySet()) {
-          lineId = entry.getKey().intValue();
-          lineHits = entry.getValue().intValue();
-          newCoverage.lineHits(lineId, lineHits);
+        try {
+          // core metrics
+          
+          NewCoverage newCoverage = sensorContext.newCoverage().ofType(CoverageType.UNIT).onFile(coveredFile);
+          
+          hitsByLine = ctcMeasures.getHitsByLine();
+          for (Map.Entry<Long, Long> entry : hitsByLine.entrySet()) {
+            lineId = entry.getKey().intValue();
+            lineHits = entry.getValue().intValue();
+            newCoverage.lineHits(lineId, lineHits);
+          }
+          
+          conditionsByLine = ctcMeasures.getConditionsByLine();
+          coveredConditionsByLine = ctcMeasures.getCoveredConditionsByLine();
+          for (Map.Entry<Long, Long> entry : conditionsByLine.entrySet()) {
+            newCoverage.conditions(entry.getKey().intValue(), entry.getValue().intValue(), coveredConditionsByLine.get(entry.getKey()).intValue());
+          }
+          newCoverage.save();
+          
+          if (ctcMeasures.getStatements() > 0) {
+            sensorContext.<Integer>newMeasure()
+              .forMetric(CtcMetrics.CTC_STATEMENTS_TO_COVER)
+              .on(coveredFile)
+              .withValue((int)(ctcMeasures.getStatements()))
+              .save();
+          
+            sensorContext.<Integer>newMeasure()
+              .forMetric(CtcMetrics.CTC_UNCOVERED_STATEMENTS)
+              .on(coveredFile)
+              .withValue((int)(ctcMeasures.getStatements() - ctcMeasures.getCoveredStatements()))
+              .save();
+          }
+          
+          
+          // CTC++ metrics
+          
+          if (ctcMeasures.getStatements() > 0) {
+            sensorContext.<Integer>newMeasure()
+              .forMetric(CtcMetrics.CTC_CONDITIONS_TO_COVER)
+              .on(coveredFile)
+              .withValue((int)(ctcMeasures.getConditions()))
+              .save();
+          
+            sensorContext.<Integer>newMeasure()
+              .forMetric(CtcMetrics.CTC_UNCOVERED_CONDITIONS)
+              .on(coveredFile)
+              .withValue((int)(ctcMeasures.getConditions() - ctcMeasures.getCoveredConditions()))
+              .save();
+          }
+            
         }
-        
-        conditionsByLine = ctcMeasures.getConditionsByLine();
-        coveredConditionsByLine = ctcMeasures.getCoveredConditionsByLine();
-        for (Map.Entry<Long, Long> entry : conditionsByLine.entrySet()) {
-          newCoverage.conditions(entry.getKey().intValue(), entry.getValue().intValue(), coveredConditionsByLine.get(entry.getKey()).intValue());
-        }
-        newCoverage.save();
-        
-        if (ctcMeasures.getStatements() > 0) {
-          sensorContext.<Integer>newMeasure()
-            .forMetric(CtcMetrics.CTC_STATEMENTS_TO_COVER)
-            .on(coveredFile)
-            .withValue((int)(ctcMeasures.getStatements()))
-            .save();
-
-          sensorContext.<Integer>newMeasure()
-            .forMetric(CtcMetrics.CTC_UNCOVERED_STATEMENTS)
-            .on(coveredFile)
-            .withValue((int)(ctcMeasures.getStatements() - ctcMeasures.getCoveredStatements()))
-            .save();
-        }
-        
-        
-        // CTC++ metrics
-        
-        if (ctcMeasures.getStatements() > 0) {
-          sensorContext.<Integer>newMeasure()
-            .forMetric(CtcMetrics.CTC_CONDITIONS_TO_COVER)
-            .on(coveredFile)
-            .withValue((int)(ctcMeasures.getConditions()))
-            .save();
-
-          sensorContext.<Integer>newMeasure()
-            .forMetric(CtcMetrics.CTC_UNCOVERED_CONDITIONS)
-            .on(coveredFile)
-            .withValue((int)(ctcMeasures.getConditions() - ctcMeasures.getCoveredConditions()))
-            .save();
+        catch (IllegalStateException e) {
+            LOG.error("Lines could not be added! ({})", e.getMessage());
         }
         
       } else {
