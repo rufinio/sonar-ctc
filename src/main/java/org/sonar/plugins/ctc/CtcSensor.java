@@ -135,11 +135,11 @@ public class CtcSensor implements Sensor {
             
         }
         catch (IllegalStateException e) {
-            LOG.error("Lines could not be added! ({})", e.getMessage());
+            LOG.warn("Lines could not be added! ({})", e.getMessage());
         }
         
       } else {
-        LOG.error("File not mapped to resource! ({})", filePath);
+        LOG.warn("File not mapped to resource! ({})", filePath);
       }
     }
   }
