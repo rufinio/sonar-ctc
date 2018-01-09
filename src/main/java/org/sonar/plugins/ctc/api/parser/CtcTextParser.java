@@ -141,6 +141,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addEachLine(Map<Long, Set<CtcCondition>> buffer) {
     long nextLineId;
+    long prevLineId = 0;
     String condsTrue;
     String condsFalse;
     CtcCondition lastCtcCondition = null;
@@ -154,8 +155,8 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
         buffer.put(lindId, line);
       }        
       
-      condsTrue = matcher.group(TRUE_CONDS);
-      condsFalse = matcher.group(FALSE_CONDS);
+      condsTrue = matcher.group(FALSE_CONDS);
+      condsFalse = matcher.group(TRUE_CONDS);
       if ((condsTrue != null) || (condsFalse != null)) {
         ctcCondition = new CtcCondition(lindId, 
           (condsTrue != null ? new BigDecimal(condsTrue).longValueExact() : 0), 
@@ -180,12 +181,16 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
       if (lastCtcCondition != null) {
         nextLineId = lastCtcCondition.getLineId() + 1;
         while (nextLineId < lindId) {
-          line.add(new CtcCondition(nextLineId, 0, lastCtcCondition.getConditionFalse(), false));
+          line = new HashSet<CtcCondition>();
+          buffer.put(nextLineId, line);
+          line.add(new CtcCondition(nextLineId, lastCtcCondition.getLineHits(), 0, false));
           nextLineId++;
         }
-        buffer.put(nextLineId, line);
       }
-      lastCtcCondition = ctcCondition;
+      if ((lastCtcCondition == null) || (lindId != prevLineId)) {
+        lastCtcCondition = ctcCondition;
+      }
+      prevLineId = lindId;
     } while (matcher.find());
   }
 
